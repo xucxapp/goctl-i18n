@@ -1,0 +1,28 @@
+.agents/
+.trae/
+
+# Go 构建产物
+bin/
+dist/
+build/
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# 测试与覆盖率文件
+coverage.out
+coverage.txt
+coverage.html
+*.coverprofile
+
+# 临时文件
+tmp/
+temp/
+*.tmp
+
+# 编辑器与系统文件
+.DS_Store
+Thumbs.db

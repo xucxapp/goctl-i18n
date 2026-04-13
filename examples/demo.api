@@ -1,0 +1,33 @@
+syntax = "v1"
+
+info (
+	title:  "goctl-i18n demo"
+	desc:   "用于验证 validate 与 i18n 插件输出"
+	author: "xucxapp"
+)
+
+type LoginReq {
+	Email string `json:"email" validate:"required,email"`
+}
+
+type CreateUserReq {
+	Name string `json:"name" validate:"required,min=2,max=20"`
+	Age  int64  `json:"age" validate:"gte=18,lte=60"`
+}
+
+type LoginResp {
+	Token string `json:"token"`
+}
+
+type CommonResp {
+	Message string `json:"message"`
+}
+
+service demo-api {
+	@handler Login
+	post /login (LoginReq) returns (LoginResp)
+
+	@handler CreateUser
+	post /users (CreateUserReq) returns (CommonResp)
+}
+

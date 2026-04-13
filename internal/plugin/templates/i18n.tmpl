@@ -1,0 +1,52 @@
+package i18n
+
+import (
+	"embed"
+	"strings"
+	"sync"
+
+	i18n "github.com/nicksnyder/go-i18n/v2/i18n"
+	"golang.org/x/text/language"
+	"gopkg.in/yaml.v3"
+)
+
+// localeFS 嵌入默认的多语言资源文件。
+//
+//go:embed locales/*.yaml
+var localeFS embed.FS
+
+var (
+	bundleOnce sync.Once
+	bundleInst *i18n.Bundle
+)
+
+// Bundle 返回全局唯一的 i18n Bundle。
+func Bundle() *i18n.Bundle {
+	bundleOnce.Do(func() {
+		bundle := i18n.NewBundle(language.Chinese)
+		bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
+		_, _ = bundle.LoadMessageFileFS(localeFS, "locales/active.zh.yaml")
+		_, _ = bundle.LoadMessageFileFS(localeFS, "locales/active.en.yaml")
+		bundleInst = bundle
+	})
+
+	return bundleInst
+}
+
+// Localize 按指定语言读取消息，不存在时回退为消息 ID。
+func Localize(lang, messageID string, templateData map[string]any) string {
+	if strings.TrimSpace(lang) == "" {
+		lang = "zh"
+	}
+
+	localizer := i18n.NewLocalizer(Bundle(), lang)
+	message, err := localizer.Localize(&i18n.LocalizeConfig{
+		MessageID:    messageID,
+		TemplateData: templateData,
+	})
+	if err != nil {
+		return messageID
+	}
+
+	return message
+}

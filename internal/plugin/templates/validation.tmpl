@@ -1,0 +1,31 @@
+package types
+
+import (
+	"regexp"
+
+	"github.com/go-playground/validator/v10"
+)
+
+// registerValidation 保存所有自定义校验器。
+var registerValidation = map[string]validator.Func{
+	"mobile": validateMobile,
+	"idcard": validateIDCard,
+}
+
+func init() {
+	for tag, handler := range registerValidation {
+		_ = validate.RegisterValidation(tag, handler)
+	}
+}
+
+// validateMobile 用于校验中国大陆手机号。
+func validateMobile(fl validator.FieldLevel) bool {
+	match, _ := regexp.MatchString(`^1[3-9]\d{9}$`, fl.Field().String())
+	return match
+}
+
+// validateIDCard 用于校验 15 位或 18 位身份证号。
+func validateIDCard(fl validator.FieldLevel) bool {
+	match, _ := regexp.MatchString(`(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)`, fl.Field().String())
+	return match
+}
