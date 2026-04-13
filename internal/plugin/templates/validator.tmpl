@@ -1,0 +1,11 @@
+package goctli18n
+
+import "github.com/go-playground/validator/v10"
+
+// validate 是请求结构体验证器的共享实例，统一定义在单独文件中，避免重复生成。
+var validate = validator.New()
+
+// ValidateStruct 使用共享校验器执行结构体校验。
+func ValidateStruct(v any) error {
+	return validate.Struct(v)
+}

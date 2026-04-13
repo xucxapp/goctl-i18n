@@ -1,11 +1,4 @@
-{{- if .NeedsValidateVar }}
-// validate 是请求结构体验证器的共享实例。
-var validate = validator.New()
-{{ end }}
-
 {{- range .RequestTypes }}
 // Validate 用于执行请求参数校验。
-func (r *{{ . }}) Validate() error {
-	return validate.Struct(r)
-}
+func (r *{{ . }}) Validate() error { return goctli18n.ValidateStruct(r) }
 {{ end }}

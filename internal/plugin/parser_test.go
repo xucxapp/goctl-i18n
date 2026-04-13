@@ -40,17 +40,20 @@ func TestDiscoverTargetProject(t *testing.T) {
 	t.Parallel()
 
 	root := t.TempDir()
-	require.NoError(t, os.MkdirAll(filepath.Join(root, "internal", "types"), 0o755))
+	serviceDir := filepath.Join(root, "apps", "demo")
+	require.NoError(t, os.MkdirAll(filepath.Join(serviceDir, "internal", "types"), 0o755))
 	require.NoError(t, os.WriteFile(filepath.Join(root, "go.mod"), []byte("module example.com/demo\n\ngo 1.26.2\n"), 0o644))
-	require.NoError(t, os.WriteFile(filepath.Join(root, "internal", "types", "types.go"), []byte("package types\n"), 0o644))
+	require.NoError(t, os.WriteFile(filepath.Join(serviceDir, "internal", "types", "types.go"), []byte("package types\n"), 0o644))
 
-	project, err := DiscoverTargetProject(&PluginContext{Dir: root}, CommandOptions{
+	project, err := DiscoverTargetProject(&PluginContext{Dir: serviceDir}, CommandOptions{
 		Command:   "validate",
 		LocaleDir: defaultLocaleDir,
 	})
 	require.NoError(t, err)
 
 	require.Equal(t, "example.com/demo", project.ModulePath)
-	require.Equal(t, filepath.Join(root, "internal", "types", "types.go"), project.TypesFilePath)
-	require.Equal(t, "example.com/demo/internal/i18n", project.I18nImportPath)
+	require.Equal(t, filepath.Join(serviceDir, "internal", "types", "types.go"), project.TypesFilePath)
+	require.Equal(t, filepath.Join(root, "tools", "goctli18n"), project.SharedDir)
+	require.Equal(t, filepath.Join(root, "tools", "goctli18n", "locales"), project.LocaleDir)
+	require.Equal(t, "example.com/demo/tools/goctli18n", project.SharedImportPath)
 }

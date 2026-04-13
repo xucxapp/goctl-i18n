@@ -8,10 +8,10 @@
 ## 功能说明
 
 - 自动识别 `.api` 中被路由引用且以 `Req` 结尾的请求结构体
-- 自动为 `internal/types/types.go` 追加 `validator/v10` 引用、共享校验器和 `Validate()` 方法
-- 可选生成 `internal/types/validation.go`，提供自定义校验注册骨架
-- 可选生成 `internal/types/translator.go`，提供 `Translate(err, lang)` 多语言翻译入口
-- 可选生成 `internal/i18n/i18n.go`
+- 自动为各服务的 `internal/types/types.go` 追加 `Validate()` 方法
+- 将共享校验器、校验扩展、翻译器和 i18n 资源统一生成到单仓根目录 `tools/goctli18n`
+- 可选生成共享 `validation.go`，提供自定义校验注册骨架
+- 可选生成共享 `translator.go`，提供 `Translate(err, lang)` 多语言翻译入口
 - 可选生成中英文两套 YAML 语言资源
 - 重复执行保持幂等，不会重复追加同一批 `Validate()` 方法
 
@@ -63,11 +63,12 @@ goctl api plugin -api demo.api -dir . -p goctl-i18n="validate --translator --cus
 
 按选项生成：
 
-- `internal/types/validation.go`
-- `internal/types/translator.go`
-- `internal/i18n/i18n.go`
-- `internal/i18n/locales/active.zh.yaml`
-- `internal/i18n/locales/active.en.yaml`
+- `tools/goctli18n/validator.go`
+- `tools/goctli18n/validation.go`
+- `tools/goctli18n/translator.go`
+- `tools/goctli18n/i18n.go`
+- `tools/goctli18n/locales/active.zh.yaml`
+- `tools/goctli18n/locales/active.en.yaml`
 
 ## Translate 示例
 
@@ -76,7 +77,7 @@ goctl api plugin -api demo.api -dir . -p goctl-i18n="validate --translator --cus
 ```go
 err := req.Validate()
 if err != nil {
-	return nil, types.Translate(err, "zh")
+	return nil, goctli18n.Translate(err, "zh")
 }
 ```
 
@@ -85,7 +86,7 @@ if err != nil {
 ```go
 err := req.Validate()
 if err != nil {
-	return nil, types.Translate(err, "en")
+	return nil, goctli18n.Translate(err, "en")
 }
 ```
 

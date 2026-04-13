@@ -1,4 +1,4 @@
-package types
+package goctli18n
 
 import (
 	"errors"
@@ -7,7 +7,6 @@ import (
 
 	"github.com/go-playground/validator/v10"
 
-	i18nhelper "{{ .I18nImportPath }}"
 )
 
 // Translate 用于将校验错误按指定语言翻译后返回。
@@ -37,7 +36,7 @@ func translateFieldError(fieldErr validator.FieldError, lang string) string {
 	}
 
 	messageID := "validate." + fieldErr.Tag()
-	message := i18nhelper.Localize(lang, messageID, data)
+	message := Localize(lang, messageID, data)
 	if message == messageID {
 		return fmt.Sprintf("%s 校验失败(%s)", fieldErr.Field(), fieldErr.Tag())
 	}

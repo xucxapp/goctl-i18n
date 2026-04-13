@@ -41,23 +41,27 @@ goctl api plugin -api demo.api -dir . -p goctl-i18n="validate --translator --cus
 指定语言资源目录：
 
 ```bash
-goctl api plugin -api demo.api -dir . -p goctl-i18n="validate --translator --locale-dir internal/i18n/locales"
+goctl api plugin -api demo.api -dir . -p goctl-i18n="validate --translator --locale-dir tools/goctli18n/locales"
 ```
 
 ## 4. 业务中使用 Translate
 
 ```go
+import goctli18n "example.com/your-module/tools/goctli18n"
+
 if err := req.Validate(); err != nil {
-	return nil, types.Translate(err, "zh")
+	return nil, goctli18n.Translate(err, "zh")
 }
 ```
 
 如果业务已经拿到语言参数，也可以直接传入：
 
 ```go
+import goctli18n "example.com/your-module/tools/goctli18n"
+
 lang := "en"
 if err := req.Validate(); err != nil {
-	return nil, types.Translate(err, lang)
+	return nil, goctli18n.Translate(err, lang)
 }
 ```
 
@@ -65,13 +69,15 @@ if err := req.Validate(); err != nil {
 
 - `internal/types/types.go`
   - 自动追加 `Validate()` 方法
-- `internal/types/validation.go`
+- `tools/goctli18n/validator.go`
+  - 统一放置共享 `validate` 实例
+- `tools/goctli18n/validation.go`
   - 自定义校验注册入口
-- `internal/types/translator.go`
+- `tools/goctli18n/translator.go`
   - 校验错误翻译入口
-- `internal/i18n/i18n.go`
+- `tools/goctli18n/i18n.go`
   - `go-i18n` 初始化与本地化工具
-- `internal/i18n/locales/*.yaml`
+- `tools/goctli18n/locales/*.yaml`
   - 语言资源文件
 
 ## 6. 本地验证

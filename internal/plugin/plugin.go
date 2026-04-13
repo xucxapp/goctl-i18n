@@ -29,9 +29,11 @@ func Execute(args []string) error {
 
 	if opts.Debug {
 		debugf(opts, "api 文件: %s", ctx.ApiFilePath)
-		debugf(opts, "输出目录: %s", ctx.Dir)
+		debugf(opts, "服务目录: %s", ctx.Dir)
+		debugf(opts, "模块根目录: %s", project.ModuleRootDir)
 		debugf(opts, "模块路径: %s", project.ModulePath)
 		debugf(opts, "types 文件: %s", project.TypesFilePath)
+		debugf(opts, "共享目录: %s", project.SharedDir)
 		debugf(opts, "请求结构体: %s", strings.Join(requestTypes, ", "))
 	}
 

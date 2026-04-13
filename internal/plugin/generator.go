@@ -20,18 +20,22 @@ type GeneratedFile struct {
 
 // TypesAppendData 是 types.go 追加代码模板的数据。
 type TypesAppendData struct {
-	NeedsValidateVar bool
-	RequestTypes     []string
-}
-
-// TranslatorData 是 translator.go 模板的数据。
-type TranslatorData struct {
-	I18nImportPath string
+	RequestTypes []string
 }
 
 // GenerateFiles 生成除 types.go 之外的所有模板文件内容。
 func GenerateFiles(project *TargetProject, opts CommandOptions) ([]GeneratedFile, error) {
-	files := make([]GeneratedFile, 0, 4)
+	files := make([]GeneratedFile, 0, 6)
+
+	validatorContent, err := renderTemplate("templates/validator.tmpl", nil)
+	if err != nil {
+		return nil, err
+	}
+	files = append(files, GeneratedFile{
+		Path:      filepath.Join(project.SharedDir, "validator.go"),
+		Content:   validatorContent,
+		Overwrite: false,
+	})
 
 	if opts.Custom {
 		content, err := renderTemplate("templates/validation.tmpl", nil)
@@ -39,21 +43,19 @@ func GenerateFiles(project *TargetProject, opts CommandOptions) ([]GeneratedFile
 			return nil, err
 		}
 		files = append(files, GeneratedFile{
-			Path:      filepath.Join(filepath.Dir(project.TypesFilePath), "validation.go"),
+			Path:      filepath.Join(project.SharedDir, "validation.go"),
 			Content:   content,
 			Overwrite: false,
 		})
 	}
 
 	if opts.Translator {
-		translatorContent, err := renderTemplate("templates/translator.tmpl", TranslatorData{
-			I18nImportPath: project.I18nImportPath,
-		})
+		translatorContent, err := renderTemplate("templates/translator.tmpl", nil)
 		if err != nil {
 			return nil, err
 		}
 		files = append(files, GeneratedFile{
-			Path:      filepath.Join(filepath.Dir(project.TypesFilePath), "translator.go"),
+			Path:      filepath.Join(project.SharedDir, "translator.go"),
 			Content:   translatorContent,
 			Overwrite: false,
 		})
@@ -63,7 +65,7 @@ func GenerateFiles(project *TargetProject, opts CommandOptions) ([]GeneratedFile
 			return nil, err
 		}
 		files = append(files, GeneratedFile{
-			Path:      filepath.Join(project.I18nDir, "i18n.go"),
+			Path:      filepath.Join(project.SharedDir, "i18n.go"),
 			Content:   i18nContent,
 			Overwrite: false,
 		})

@@ -22,13 +22,13 @@ type PluginContext struct {
 
 // TargetProject 描述要被写入的目标项目。
 type TargetProject struct {
-	RootDir        string
-	ModulePath     string
-	TypesFilePath  string
-	TypesPackage   string
-	I18nDir        string
-	LocaleDir      string
-	I18nImportPath string
+	ServiceDir       string
+	ModuleRootDir    string
+	ModulePath       string
+	TypesFilePath    string
+	SharedDir        string
+	LocaleDir        string
+	SharedImportPath string
 }
 
 // LoadPluginContext 从 goctl 标准输入中读取插件上下文。
@@ -48,7 +48,7 @@ func LoadPluginContext() (*PluginContext, error) {
 
 // DiscoverTargetProject 解析目标项目的重要路径。
 func DiscoverTargetProject(ctx *PluginContext, opts CommandOptions) (*TargetProject, error) {
-	modulePath, err := readModulePath(filepath.Join(ctx.Dir, "go.mod"))
+	moduleRootDir, modulePath, err := findModuleRoot(ctx.Dir)
 	if err != nil {
 		return nil, err
 	}
@@ -58,20 +58,28 @@ func DiscoverTargetProject(ctx *PluginContext, opts CommandOptions) (*TargetProj
 		return nil, err
 	}
 
-	project := &TargetProject{
-		RootDir:       ctx.Dir,
-		ModulePath:    modulePath,
-		TypesFilePath: typesFilePath,
-		TypesPackage:  "types",
-		I18nDir:       filepath.Join(ctx.Dir, "internal", "i18n"),
-		LocaleDir:     filepath.Join(ctx.Dir, filepath.FromSlash(opts.LocaleDir)),
+	normalizedLocaleDir := strings.TrimRight(opts.LocaleDir, "/")
+	sharedRelativeDir := strings.TrimSuffix(normalizedLocaleDir, "/locales")
+	if sharedRelativeDir == normalizedLocaleDir {
+		sharedRelativeDir = normalizedLocaleDir
 	}
 
-	i18nRelative, err := filepath.Rel(ctx.Dir, project.I18nDir)
+	sharedDir := filepath.Join(moduleRootDir, filepath.FromSlash(sharedRelativeDir))
+	localeDir := filepath.Join(moduleRootDir, filepath.FromSlash(normalizedLocaleDir))
+	sharedRelative, err := filepath.Rel(moduleRootDir, sharedDir)
 	if err != nil {
-		return nil, fmt.Errorf("计算 i18n 相对路径失败: %w", err)
+		return nil, fmt.Errorf("计算共享目录相对路径失败: %w", err)
 	}
-	project.I18nImportPath = modulePath + "/" + filepath.ToSlash(i18nRelative)
+
+	project := &TargetProject{
+		ServiceDir:       ctx.Dir,
+		ModuleRootDir:    moduleRootDir,
+		ModulePath:       modulePath,
+		TypesFilePath:    typesFilePath,
+		SharedDir:        sharedDir,
+		LocaleDir:        localeDir,
+		SharedImportPath: modulePath + "/" + filepath.ToSlash(sharedRelative),
+	}
 
 	return project, nil
 }
@@ -132,6 +140,26 @@ func readModulePath(goModPath string) (string, error) {
 	}
 
 	return "", fmt.Errorf("go.mod 中未找到 module 声明")
+}
+
+func findModuleRoot(startDir string) (string, string, error) {
+	current := startDir
+	for {
+		goModPath := filepath.Join(current, "go.mod")
+		if fileExists(goModPath) {
+			modulePath, err := readModulePath(goModPath)
+			if err != nil {
+				return "", "", err
+			}
+			return current, modulePath, nil
+		}
+
+		parent := filepath.Dir(current)
+		if parent == current {
+			return "", "", fmt.Errorf("从 %s 向上查找 go.mod 失败", startDir)
+		}
+		current = parent
+	}
 }
 
 func findTypesFile(root string) (string, error) {
