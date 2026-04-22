@@ -29,7 +29,7 @@ func UpdateTypesFile(project *TargetProject, requestTypes []string) error {
 	}
 
 	if !astutil.UsesImport(file, project.SharedImportPath) {
-		astutil.AddNamedImport(fset, file, "goctli18n", project.SharedImportPath)
+		astutil.AddNamedImport(fset, file, "i18n", project.SharedImportPath)
 	}
 	removeImport(file, "github.com/go-playground/validator/v10")
 	removeValidateVar(file)
@@ -224,7 +224,7 @@ func rewriteValidateMethods(file *ast.File, requestTypes []string) {
 					Results: []ast.Expr{
 						&ast.CallExpr{
 							Fun: &ast.SelectorExpr{
-								X:   ast.NewIdent("goctli18n"),
+								X:   ast.NewIdent("i18n"),
 								Sel: ast.NewIdent("ValidateStruct"),
 							},
 							Args: []ast.Expr{ast.NewIdent(receiverName)},

@@ -53,7 +53,7 @@ func TestDiscoverTargetProject(t *testing.T) {
 
 	require.Equal(t, "example.com/demo", project.ModulePath)
 	require.Equal(t, filepath.Join(serviceDir, "internal", "types", "types.go"), project.TypesFilePath)
-	require.Equal(t, filepath.Join(root, "tools", "goctli18n"), project.SharedDir)
-	require.Equal(t, filepath.Join(root, "tools", "goctli18n", "locales"), project.LocaleDir)
-	require.Equal(t, "example.com/demo/tools/goctli18n", project.SharedImportPath)
+	require.Equal(t, filepath.Join(root, "tools", "i18n"), project.SharedDir)
+	require.Equal(t, filepath.Join(root, "tools", "i18n", "locales"), project.LocaleDir)
+	require.Equal(t, "example.com/demo/tools/i18n", project.SharedImportPath)
 }

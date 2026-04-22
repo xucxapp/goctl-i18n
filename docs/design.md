@@ -11,7 +11,7 @@
 3. 插件定位目标服务中的 `internal/types/types.go`
 4. 插件从 `.api` AST 中收集被路由引用且以 `Req` 结尾的请求结构体
 5. 插件更新 `types.go`
-6. 插件统一在单仓根目录 `tools/goctli18n` 生成共享文件
+6. 插件统一在单仓根目录 `tools/i18n` 生成共享文件
 7. 插件按参数选择是否生成 `validation.go`、`translator.go`、`i18n.go` 与语言资源
 
 ## 核心分层
@@ -30,17 +30,17 @@
 ## Validate 接入策略
 
 - 通过为 `*Req` 类型追加 `Validate() error` 接入 go-zero 请求解析流程
-- `Validate()` 方法统一调用共享包 `tools/goctli18n.ValidateStruct`
-- 共享 `validator.New()` 实例命名为 `validate`，并统一生成到 `tools/goctli18n/validator.go`
-- 自定义校验函数注册拆到 `tools/goctli18n/validation.go`，避免每个服务重复生成
+- `Validate()` 方法统一调用共享包 `tools/i18n.ValidateStruct`
+- 共享 `validator.New()` 实例命名为 `validate`，并统一生成到 `tools/i18n/validator.go`
+- 自定义校验函数注册拆到 `tools/i18n/validation.go`，避免每个服务重复生成
 
 ## i18n 设计
 
 - 使用 `go-i18n` 作为翻译底座
 - 默认生成：
-  - `tools/goctli18n/i18n.go`
-  - `tools/goctli18n/locales/active.zh.yaml`
-  - `tools/goctli18n/locales/active.en.yaml`
+  - `tools/i18n/i18n.go`
+  - `tools/i18n/locales/active.zh.yaml`
+  - `tools/i18n/locales/active.en.yaml`
 - 语言资源使用 YAML 格式，首版聚焦 validator 常用标签
 - 对外翻译入口为 `Translate(err, lang string) error`
 - 插件不负责从 HTTP Header 自动取语言，语言由业务显式传入
@@ -48,7 +48,7 @@
 ## 幂等策略
 
 - `types.go` 使用 Go AST 检查 import 和已有 `Validate()` 方法
-- 共享校验器固定写入 `tools/goctli18n/validator.go`，避免分组模式下重复落到 `types.go`
+- 共享校验器固定写入 `tools/i18n/validator.go`，避免分组模式下重复落到 `types.go`
 - 已存在的共享 `validation.go`、`translator.go`、`i18n.go` 与语言资源默认不覆盖
 - 重复执行插件时，同一个请求结构体不会重复追加 `Validate()` 方法
 

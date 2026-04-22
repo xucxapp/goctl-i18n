@@ -23,7 +23,7 @@ func TestUpdateTypesFileIdempotent(t *testing.T) {
 
 	project := &TargetProject{
 		TypesFilePath:    typesFile,
-		SharedImportPath: "example.com/demo/tools/goctli18n",
+		SharedImportPath: "example.com/demo/tools/i18n",
 	}
 	requestTypes := []string{"CreateUserReq", "LoginReq"}
 
@@ -31,12 +31,12 @@ func TestUpdateTypesFileIdempotent(t *testing.T) {
 
 	firstRun, err := os.ReadFile(typesFile)
 	require.NoError(t, err)
-	require.Contains(t, string(firstRun), `"example.com/demo/tools/goctli18n"`)
+	require.Contains(t, string(firstRun), `"example.com/demo/tools/i18n"`)
 	require.NotContains(t, string(firstRun), `"github.com/go-playground/validator/v10"`)
 	require.NotContains(t, string(firstRun), "var validate = validator.New()")
 	require.Contains(t, string(firstRun), "func (r *CreateUserReq) Validate() error")
 	require.Contains(t, string(firstRun), "func (r *LoginReq) Validate() error")
-	require.Contains(t, string(firstRun), "return goctli18n.ValidateStruct(r)")
+	require.Contains(t, string(firstRun), "return i18n.ValidateStruct(r)")
 
 	require.NoError(t, UpdateTypesFile(project, requestTypes))
 
@@ -73,17 +73,17 @@ func (r *LoginReq) Validate() error {
 
 	project := &TargetProject{
 		TypesFilePath:    typesFile,
-		SharedImportPath: "example.com/demo/tools/goctli18n",
+		SharedImportPath: "example.com/demo/tools/i18n",
 	}
 
 	require.NoError(t, UpdateTypesFile(project, []string{"LoginReq"}))
 
 	content, err := os.ReadFile(typesFile)
 	require.NoError(t, err)
-	require.Contains(t, string(content), `"example.com/demo/tools/goctli18n"`)
+	require.Contains(t, string(content), `"example.com/demo/tools/i18n"`)
 	require.NotContains(t, string(content), `"github.com/go-playground/validator/v10"`)
 	require.NotContains(t, string(content), "var validate = validator.New()")
-	require.Contains(t, string(content), "return goctli18n.ValidateStruct(r)")
+	require.Contains(t, string(content), "return i18n.ValidateStruct(r)")
 }
 
 func TestWriteGeneratedFilesSkipExisting(t *testing.T) {

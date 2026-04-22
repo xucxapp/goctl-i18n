@@ -1,4 +1,4 @@
 {{- range .RequestTypes }}
 // Validate 用于执行请求参数校验。
-func (r *{{ . }}) Validate() error { return goctli18n.ValidateStruct(r) }
+func (r *{{ . }}) Validate() error { return i18n.ValidateStruct(r) }
 {{ end }}

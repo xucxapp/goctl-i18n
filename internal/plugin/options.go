@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-const defaultLocaleDir = "tools/goctli18n/locales"
+const defaultLocaleDir = "tools/i18n/locales"
 
 // CommandOptions 描述 validate 子命令的参数。
 type CommandOptions struct {

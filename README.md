@@ -9,7 +9,7 @@
 
 - 自动识别 `.api` 中被路由引用且以 `Req` 结尾的请求结构体
 - 自动为各服务的 `internal/types/types.go` 追加 `Validate()` 方法
-- 将共享校验器、校验扩展、翻译器和 i18n 资源统一生成到单仓根目录 `tools/goctli18n`
+- 将共享校验器、校验扩展、翻译器和 i18n 资源统一生成到单仓根目录 `tools/i18n`
 - 可选生成共享 `validation.go`，提供自定义校验注册骨架
 - 可选生成共享 `translator.go`，提供 `Translate(err, lang)` 多语言翻译入口
 - 可选生成中英文两套 YAML 语言资源
@@ -63,30 +63,34 @@ goctl api plugin -api demo.api -dir . -p goctl-i18n="validate --translator --cus
 
 按选项生成：
 
-- `tools/goctli18n/validator.go`
-- `tools/goctli18n/validation.go`
-- `tools/goctli18n/translator.go`
-- `tools/goctli18n/i18n.go`
-- `tools/goctli18n/locales/active.zh.yaml`
-- `tools/goctli18n/locales/active.en.yaml`
+- `tools/i18n/validator.go`
+- `tools/i18n/validation.go`
+- `tools/i18n/translator.go`
+- `tools/i18n/i18n.go`
+- `tools/i18n/locales/active.zh.yaml`
+- `tools/i18n/locales/active.en.yaml`
 
 ## Translate 示例
 
 当开启 `--translator` 后，可在业务中显式传入语言：
 
 ```go
+import i18n "example.com/your-module/tools/i18n"
+
 err := req.Validate()
 if err != nil {
-	return nil, goctli18n.Translate(err, "zh")
+	return nil, i18n.Translate(err, "zh")
 }
 ```
 
 或：
 
 ```go
+import i18n "example.com/your-module/tools/i18n"
+
 err := req.Validate()
 if err != nil {
-	return nil, goctli18n.Translate(err, "en")
+	return nil, i18n.Translate(err, "en")
 }
 ```
 

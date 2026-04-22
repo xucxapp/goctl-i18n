@@ -12,9 +12,9 @@ func TestGenerateFiles(t *testing.T) {
 
 	project := &TargetProject{
 		TypesFilePath:    filepath.Join("demo", "apps", "apiuser", "internal", "types", "types.go"),
-		SharedDir:        filepath.Join("demo", "tools", "goctli18n"),
-		LocaleDir:        filepath.Join("demo", "tools", "goctli18n", "locales"),
-		SharedImportPath: "example.com/demo/tools/goctli18n",
+		SharedDir:        filepath.Join("demo", "tools", "i18n"),
+		LocaleDir:        filepath.Join("demo", "tools", "i18n", "locales"),
+		SharedImportPath: "example.com/demo/tools/i18n",
 	}
 
 	files, err := GenerateFiles(project, CommandOptions{
@@ -31,12 +31,12 @@ func TestGenerateFiles(t *testing.T) {
 		contentByBase[filepath.Base(file.Path)] = string(file.Content)
 	}
 
-	require.Contains(t, contentByBase["translator.go"], "package goctli18n")
+	require.Contains(t, contentByBase["translator.go"], "package i18n")
 	require.Contains(t, contentByBase["validator.go"], "var validate = validator.New()")
 	require.Contains(t, contentByBase["validation.go"], "registerValidation")
-	require.Contains(t, contentByBase["validation.go"], "package goctli18n")
+	require.Contains(t, contentByBase["validation.go"], "package i18n")
 	require.Contains(t, contentByBase["i18n.go"], "LoadMessageFileFS")
-	require.Contains(t, contentByBase["i18n.go"], "package goctli18n")
+	require.Contains(t, contentByBase["i18n.go"], "package i18n")
 	require.Contains(t, contentByBase["active.zh.yaml"], "validate.required")
 	require.Contains(t, contentByBase["active.en.yaml"], "validate.required")
 }
